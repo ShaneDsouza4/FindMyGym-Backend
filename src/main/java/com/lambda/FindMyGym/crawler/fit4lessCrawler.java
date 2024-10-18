@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
@@ -19,6 +20,7 @@ import java.util.NoSuchElementException;
 @Service
 @AllArgsConstructor
 
+@Component
 public class fit4lessCrawler {
 
     public void getFit4lessDetails(String provinceName, String cityName) {

@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Document(collection = "tasks")
+@Document(collection = "gymDetails")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +17,7 @@ import java.util.List;
 
 public class GymDetails {
 
+    @Id
     private String ID;
     private String gym;
     private  String city;
@@ -144,5 +145,8 @@ public class GymDetails {
 
     public String getGym() {
         return gym;
+    }
+
+    public void setId(String string) {
     }
 }

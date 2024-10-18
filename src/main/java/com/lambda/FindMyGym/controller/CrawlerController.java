@@ -3,6 +3,7 @@ package com.lambda.FindMyGym.controller;
 import com.lambda.FindMyGym.crawler.fit4lessCrawler;
 import com.lambda.FindMyGym.model.Task;
 import com.lambda.FindMyGym.parser.fit4lessParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,7 +13,10 @@ import java.io.IOException;
 @RestController
 public class CrawlerController {
 
+    @Autowired
     private fit4lessCrawler  fit4lessCrawler  = new fit4lessCrawler();
+
+    @Autowired
     fit4lessParser fit4lessParser = new fit4lessParser();
 
 

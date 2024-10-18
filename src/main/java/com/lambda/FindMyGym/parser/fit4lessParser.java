@@ -2,11 +2,14 @@ package com.lambda.FindMyGym.parser;
 
 import com.google.gson.*;
 import com.lambda.FindMyGym.model.GymDetails;
+import com.lambda.FindMyGym.service.GymDetailsService;
 import com.lambda.FindMyGym.validators.Validator;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileReader;
@@ -14,7 +17,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+@Component
 public class fit4lessParser {
+
+    @Autowired
+    private GymDetailsService gymDetailsService;  // Inject GymDetailsService to call the DB insertion method
 
     public List<GymDetails> parsefit4Less() throws IOException {
 
@@ -217,15 +224,43 @@ public class fit4lessParser {
                 }
             }
 
+
+
             //Writing data in JSON file
-            try (FileWriter fileWriter = new FileWriter("gymData.json")) {
-                Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-                gson.toJson(jsonArray, fileWriter);
-                System.out.println("Data succesfully written to gymData.json file");
-            } catch (IOException e) {
-                //e.printStackTrace();
-                System.out.println("Can not read file");
+//            try (FileWriter fileWriter = new FileWriter("gymData.json")) {
+//                Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+//                gson.toJson(jsonArray, fileWriter);
+//                System.out.println("Data succesfully written to gymData.json file");
+//            } catch (IOException e) {
+//                //e.printStackTrace();
+//                System.out.println("Can not read file");
+//            }
+
+            // COnverting jsonArray to list of GymDetals object
+            List<GymDetails> gymDetailsList = new ArrayList<>();
+            Gson gson = new Gson();
+
+            for (JsonElement element : jsonArray) {
+                GymDetails gymDetails = gson.fromJson(element, GymDetails.class);
+                gymDetailsList.add(gymDetails);
             }
+
+            try {
+                gymDetailsService.addGymDetailsBulk(gymDetailsList);
+                System.out.println("Data successfully added to the database");
+
+                File folder = new File("HTMLFilesfit4Less");
+                if (folder.exists() && folder.isDirectory()) {
+                    deleteFolder(folder);  // Call the method to delete folder and its contents
+                    System.out.println("HTMLFilesfit4Less folder deleted successfully.");
+                } else {
+                    System.out.println("HTMLFilesfit4Less folder does not exist.");
+                }
+
+            } catch (Exception e) {
+                System.out.println("Failed to save data to the database: " + e.getMessage());
+            }
+
         }else{
             System.out.println("HTMLFilesfit4less folder does not exist.");
         }
@@ -239,4 +274,20 @@ public class fit4lessParser {
         }
         return Character.toUpperCase(word.charAt(0)) + word.substring(1);
     }
+
+    //Delete folder
+    public void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if (files != null) { // Check if there are files in the folder
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteFolder(file);  // Recursively delete subdirectories
+                } else {
+                    file.delete();  // Delete files
+                }
+            }
+        }
+        folder.delete();  // Finally, delete the root folder
+    }
+
 }
